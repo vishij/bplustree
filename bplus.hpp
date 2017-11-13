@@ -1,41 +1,36 @@
+#ifndef BPLUS_HPP_
+#define BPLUS_HPP_
+
+#include <iostream>
 #include <string>
-#include "bplus.hpp"
 #include "node.hpp"
 
-void BPlusTree::initialise(int order)
+class BPlusTree
 {
-    this->order = order;
+private:
+    InternalNode *root;
+    int order;
 
-    root = new InternalNode();
-}
+    // useful only for internal debugging purposes
+    // TODO remove before submission
+    DataNode *head;
+    DataNode *tail;
 
-void BPlusTree::insert(float key_to_insert, std::string value)
-{
-    Node *currNode = root;
+public:
+    void initialise(int order);
+    void insert(float key, std::string value);
+    std::string search(float key);
 
-    while (currNode->get_type().compare("DATA") != 0)
-    {
-        for (std::vector<float>::iterator i = curr_node->keys.begin(); i != curr_node->keys.end(); ++i)
-        {
-            if (key_to_insert < *i)
-            {
-                currNode = currNode->child_ptrs.at(i - curr_node->keys.begin());
-                break;
-            }
-        }
-    }
-}
+    /*
+     * Ranged search
+     *
+     * Search for key such that key_start <= key <= key_end
+     */
+    std::string search(float key_start, float key_end);
 
-std::string BPlusTree::search(float key)
-{
+    // useful only for internal debugging purposes
+    // TODO remove before submission
+    void print_all_keys();
+};
 
-}
-
-/*
- * Ranged search
- *
- * Search for key such that key_start <= key <= key_end
- */
-std::string BPlusTree::search(float key_start, float key_end)
-{
-}
+#endif

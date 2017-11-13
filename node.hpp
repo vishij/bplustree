@@ -29,35 +29,56 @@ public:
 
     // returns the index where the key was inserted
     // this index is used to add a child pointer
-    int insert_key(float key)
+    void insert_key(float key)
     {
-        for (std::vector<float>::iterator i = v.begin(); i!= v.end(); ++i)
+        for (std::vector<float>::iterator i = keys.begin(); i!= keys.end(); ++i)
         {
             if (key < *i)
             {
-                v.insert(i, key);
-                return i - v.begin();
+                keys.insert(i, key);
+                //return i - keys.begin();
             }
         }
+    }
+
+    // maybe just a temp method
+    // TODO remove if not required after testing
+    void create_new_child(int pos, Node *child_ptr)
+    {
+        child_ptrs.insert(child_ptrs.begin() + pos, child_ptr);
     }
 };
 
 class DataNode: public Node
 {
 private:
-    float key;
-    std::string value;
+    // read the notes on the keys field of InternalNode
+    std::vector<float> keys = { FLT_MAX };
+    std::vector<std::string> values;
     DataNode *left;
     DataNode *right;
 
 public:
-    DataNode(float key, std::string value)
-        : key(key), value(value)
+    DataNode()
     {
         left = right = nullptr;
     }
 
     virtual std::string get_type() { return "DATA"; }
+
+    void insert(float key, std::string value)
+    {
+        for (std::vector<float>::iterator i = keys.begin(); i!= keys.end(); ++i)
+        {
+            if (key < *i)
+            {
+                keys.insert(i, key);
+                // insert value at ith position
+                values.insert(values.begin() + (i - keys.begin()), value);
+                break;
+            }
+        }
+    }
 
     // I think it's a bad idea to have this side effect in the destructor
     // TODO Will remove it if I find it makes the main program surprising
