@@ -7,7 +7,7 @@ void BPlusTree::initialise(int order)
     this->order = order;
 
     // initialise empty data node (with FLT_MAX as the only key)
-    first_data_node  = new DataNode();
+    auto first_data_node  = new DataNode();
     head = tail = first_data_node;
 
     // initialise empty internal node (root) with FLT_MAX as the only key
@@ -23,16 +23,21 @@ void BPlusTree::insert(float key_to_insert, std::string value)
     // reach a DataNode first
     while (curr_node->get_type().compare("DATA") != 0)
     {
-        for (std::vector<float>::iterator i = curr_node->keys.begin(); i != curr_node->keys.end(); ++i)
+        std::cout << "Entered an internal node" << std::endl;
+        InternalNode *curr_internal_node = static_cast<InternalNode*>(curr_node);
+        for (std::vector<float>::iterator i = curr_internal_node->keys.begin(); i < curr_internal_node->keys.end(); ++i)
         {
             if (key_to_insert < *i)
             {
-                curr_node = curr_node->child_ptrs.at(i - curr_node->keys.begin());
+                curr_node = curr_internal_node->child_ptrs.at(i - curr_internal_node->keys.begin());
+                std::cout << "Shifted to the child at " << i - curr_internal_node->keys.begin() << std::endl;
                 break;
             }
         }
     }
-    curr_node.insert(key_to_insert, value);
+    DataNode *curr_data_node = static_cast<DataNode*>(curr_node);
+    std::cout << "Trying to insert in DataNode..." << std::endl;
+    curr_data_node->insert(key_to_insert, value);
 }
 
 std::string BPlusTree::search(float key)
@@ -51,9 +56,14 @@ std::string BPlusTree::search(float key_start, float key_end)
 
 void BPlusTree::print_all_keys()
 {
-    for (DataNode *dn=head; dn=dn->right; dn==nullptr)
+    for (DataNode *dn=head; dn!=nullptr; dn=dn->right)
     {
-        std::cout << "%f  " << dn->key;
+        for (auto const &key: dn->keys)
+        {
+            std::cout << key << " ";
+        }
+
+        //std::cout << "%f  " << dn->key;
     }
     std::cout << std::endl;
 }
