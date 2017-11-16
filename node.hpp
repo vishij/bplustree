@@ -74,14 +74,11 @@ public:
         {
             if (key < *i)
             {
-                std::cout << "Inside DataNode's insert at pos " << i - keys.begin() << std::endl;
-                keys.insert(i, key);
-                std::cout << "Insertion successful in keys" << std::endl;
+                // IMPORTANT!! Don't forget to capture the new value of the
+                // iterator after insertion
+                i = keys.insert(i, key);
                 // insert value at ith position
-                auto pos = i - keys.begin();
-                std::cout << "Pos calculated successfully!" << std::endl;
-                values.insert(values.begin() + pos, value);
-                std::cout << "Insertion successful in values" << std::endl;
+                values.insert(values.begin() + (i - keys.begin()), value);
                 break;
             }
         }
