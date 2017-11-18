@@ -54,7 +54,7 @@ public:
     // TODO test if this needs to be made virtual
     InternalNode* split(int order)
     {
-       std::vector<float>::const_iterator old_dn_keys_end = keys.begin() + ceil((order / 2) - 1);
+       std::vector<float>::const_iterator old_dn_keys_end = keys.begin() + ceil(order / 2) - 1;
        std::vector<string>::const_iterator old_dn_values_end = values.begin() + ceil((order / 2) - 1);
 
        // create new DataNode with subset of larger keys and values
@@ -72,10 +72,17 @@ public:
        new_dn->parent = new_dn_parent;
 
        // truncate the smaller subset in the existing node
-       keys = keys.resize(old_dn_keys_end - keys.begin());
+       keys.resize(old_dn_keys_end - keys.begin());
        keys.push_back(FLT_MAX);
-       values = values.resize(old_dn_keys_end - keys.begin());
+       values.resize(old_dn_keys_end - keys.begin());
        values.push_back("END_MARKER");
+
+       // add new node into the doubly linked list
+       new_dn->right = right;
+       new_dn->left = this;
+       right = new_dn;
+
+       return new_dn;
     }
 
     // maybe just a temp method
