@@ -8,7 +8,7 @@
 class BPlusTree
 {
 private:
-    InternalNode *root;
+    Node *root;
     int order;
 
     // useful only for internal debugging purposes
@@ -18,6 +18,7 @@ private:
 
 public:
     void initialise(int order);
+    int get_order();
     void insert(float key, std::string value);
     std::string search(float key);
 

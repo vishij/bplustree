@@ -4,16 +4,18 @@
 
 void BPlusTree::initialise(int order)
 {
+    // an InternalNode can have at most "order" no. of children
+    // i.e., InternalNodes and DataNodes can have at most (order - 1) no. of keys
     this->order = order;
 
-    // initialise empty data node (with FLT_MAX as the only key)
-    auto first_data_node  = new DataNode();
-    head = tail = first_data_node;
+    // initialise root as an empty (with FLT_MAX as the only key) data node
+    root = new DataNode();
+    head = tail = static_cast<DataNode*>(root);
+}
 
-    // initialise empty internal node (root) with FLT_MAX as the only key
-    // and the first, empty data node as its child
-    root = new InternalNode();
-    root->create_new_child(0, first_data_node);
+int BPlusTree::get_order()
+{
+    return order;
 }
 
 void BPlusTree::insert(float key_to_insert, std::string value)
@@ -54,16 +56,11 @@ std::string BPlusTree::search(float key_start, float key_end)
 {
 }
 
+// TODO remove this temporary method
 void BPlusTree::print_all_keys()
 {
-    for (DataNode *dn=head; dn!=nullptr; dn=dn->right)
+    for (DataNode *dn = head; dn != nullptr; dn=dn->get_right())
     {
-        for (auto const &key: dn->keys)
-        {
-            std::cout << key << " ";
-        }
-
-        //std::cout << "%f  " << dn->key;
+        dn->print_all_keys();
     }
-    std::cout << std::endl;
 }

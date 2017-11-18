@@ -41,8 +41,14 @@ int main(int argc, char** argv)
 
     auto bptree = new BPlusTree();
     bptree->initialise(4);
+    std::cout << "B+ tree has bee initialised with order " << bptree->get_order() << std::endl;
 
     bptree->insert(3.5, "something");
+
+    for (int i=1; i <= 20; ++i)
+    {
+        bptree->insert(i + 0.5, "some_random_value");
+    }
     bptree->print_all_keys();
 
     ofstream outf("output_file.txt");
