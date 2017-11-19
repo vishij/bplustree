@@ -68,6 +68,7 @@ public:
         new_middle->insert_key(*(keys.begin() + old_dn_keys_end + 1));
 
         // truncate this node's information
+        // IMPORTANT! Be sure to add 1 in resize because vectors are 0-indexed
         keys.resize(old_dn_keys_end + 1);
         keys.push_back(FLT_MAX);
         child_ptrs.resize(old_dn_keys_end + 2);
@@ -144,9 +145,10 @@ public:
         new_dn->values = std::vector<std::string>(old_dn_values_end + 1, values.end());
 
         // truncate the smaller subset in the existing node
-        keys.resize(old_dn_keys_end - keys.begin());
+        // IMPORTANT! Be sure to add 1 in resize because vectors are 0-indexed
+        keys.resize(old_dn_keys_end - keys.begin() + 1);
         keys.push_back(FLT_MAX);
-        values.resize(old_dn_keys_end - keys.begin());
+        values.resize(old_dn_keys_end - keys.begin() + 1);
         values.push_back("END_MARKER");
 
         // add new node into the doubly linked list
