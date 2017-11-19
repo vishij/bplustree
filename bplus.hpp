@@ -20,7 +20,7 @@ public:
     void initialise(int order);
     int get_order();
     void insert(float key, std::string value);
-    std::string search(float key);
+    std::vector<std::string> search(float key);
 
     /*
      * Ranged search

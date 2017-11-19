@@ -1,43 +1,37 @@
 #include <string>
 #include "bplus.hpp"
-#include "node.hpp"
 
-void BPlusTree::initialise(int order)
-{
+void BPlusTree::initialise(int order) {
     // an InternalNode can have at most "order" no. of children
     // i.e., InternalNodes and DataNodes can have at most (order - 1) no. of keys
     this->order = order;
 
     // initialise root as an empty (with FLT_MAX as the only key) data node
     root = new DataNode();
-    head = tail = static_cast<DataNode*>(root);
+    head = tail = static_cast<DataNode *>(root);
 }
 
-int BPlusTree::get_order()
-{
+int BPlusTree::get_order() {
     return order;
 }
 
-void BPlusTree::insert(float key_to_insert, std::string value)
-{
+void BPlusTree::insert(float key_to_insert, std::string value) {
     Node *curr_node = root;
-
+    std::cout << "before..." << std::endl;
     // reach a DataNode first
-    while (curr_node->get_type().compare("DATA") != 0)
-    {
+    while (curr_node->get_type().compare("DATA") != 0) {
         std::cout << "Entered an internal node" << std::endl;
-        InternalNode *curr_internal_node = static_cast<InternalNode*>(curr_node);
-        for (std::vector<float>::iterator i = curr_internal_node->keys.begin(); i < curr_internal_node->keys.end(); ++i)
-        {
-            if (key_to_insert < *i)
-            {
+        InternalNode *curr_internal_node = static_cast<InternalNode *>(curr_node);
+        for (std::vector<float>::iterator i = curr_internal_node->keys.begin();
+             i < curr_internal_node->keys.end(); ++i) {
+            if (key_to_insert < *i) {
                 curr_node = curr_internal_node->child_ptrs.at(i - curr_internal_node->keys.begin());
                 std::cout << "Shifted to the child at " << i - curr_internal_node->keys.begin() << std::endl;
                 break;
             }
         }
     }
-    DataNode *curr_data_node = static_cast<DataNode*>(curr_node);
+    DataNode *curr_data_node = static_cast<DataNode *>(curr_node);
     std::cout << "Trying to insert in DataNode..." << std::endl;
     curr_data_node->insert(key_to_insert, value);
     std::cout << "Key inserted in DataNode sucessfully" << std::endl;
@@ -76,9 +70,51 @@ void BPlusTree::insert(float key_to_insert, std::string value)
     }
 }
 
-std::string BPlusTree::search(float key)
-{
+std::vector<std::string> BPlusTree::search(float key) {
+    std::cout << "In search method:: " << std::endl;
+    Node *curr_node = root;
+    std::vector<std::string> search_output_arr;
+    std::cout << "In search method:: before wgile " << curr_node->get_type().compare("DATA") << std::endl;
+    // reach a DataNode first
+    while (curr_node->get_type().compare("DATA") != 0) {
+        std::cout << "In while::  " << std::endl;
+        std::cout << "Entered an internal node" << std::endl;
+        // cast Node to internal node
+        InternalNode *curr_internal_node = static_cast<InternalNode *>(curr_node);
+        for (std::vector<float>::iterator i = curr_internal_node->keys.begin();
+             i < curr_internal_node->keys.end(); ++i) {
+            // search key < key from internal node
+            if (key < *i) {
+                curr_node = curr_internal_node->child_ptrs.at(i - curr_internal_node->keys.begin());
+                std::cout << "Shifted to the child at " << i - curr_internal_node->keys.begin() << std::endl;
+                break;
+            }
+        }
+    }
 
+    std::cout << "In search method:: after while " << std::endl;
+    //after reaching data node, convert the curr_node to type - DataNode
+    DataNode *curr_data_node = static_cast<DataNode *>(curr_node);
+    std::cout << "curr data" << std::endl;
+
+    //values from
+    while (curr_data_node != nullptr) {
+        std::cout << "curr data in while" << std::endl;
+        for (std::vector<float>::const_iterator i = curr_data_node->keys.begin(); i < curr_data_node->keys.end(); ++i) {
+            std::cout << "*** for" << std::endl;
+            if (key == *i) {
+                std::cout << "*** if condition" << std::endl;
+                search_output_arr.push_back(curr_data_node->values.at(i - curr_data_node->keys.begin()));
+                std::cout << "*** post if condition" << std::endl;
+            }
+            std::cout << "*** out if condition" << std::endl;
+        }
+        std::cout << "*** for end if condition" << std::endl;
+        curr_data_node = curr_data_node->right;
+        std::cout << "*** curr_data_node" << std::endl;
+    }
+    std::cout << "*** outside while" << std::endl;
+    return search_output_arr;
 }
 
 /*
@@ -86,15 +122,13 @@ std::string BPlusTree::search(float key)
  *
  * Search for key such that key_start <= key <= key_end
  */
-std::string BPlusTree::search(float key_start, float key_end)
-{
-}
+    std::string BPlusTree::search(float key_start, float key_end) {
+        return nullptr;
+    }
 
 // TODO remove this temporary method
-void BPlusTree::print_all_keys()
-{
-    for (DataNode *dn = head; dn != nullptr; dn=dn->get_right())
-    {
-        dn->print_all_keys();
+    void BPlusTree::print_all_keys() {
+        for (DataNode *dn = head; dn != nullptr; dn = dn->get_right()) {
+            dn->print_all_keys();
+        }
     }
-}
