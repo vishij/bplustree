@@ -40,6 +40,39 @@ void BPlusTree::insert(float key_to_insert, std::string value)
     DataNode *curr_data_node = static_cast<DataNode*>(curr_node);
     std::cout << "Trying to insert in DataNode..." << std::endl;
     curr_data_node->insert(key_to_insert, value);
+    std::cout << "Key inserted in DataNode sucessfully" << std::endl;
+
+    DataNode *new_data_node;
+    if (curr_data_node->get_n_keys() == order)
+    {
+        std::cout << "Trying to split DataNode" << std::endl;
+        new_data_node = curr_data_node->split(order);
+        std::cout << "DataNode split completed successfully" << std::endl;
+
+        // if this is not the root node, we need to handle insert and (possibly)
+        // split on its ancestors, up to the root
+        if (nullptr != curr_data_node->parent)
+        {
+            // first key from new DataNode gets inserted into its parent
+            // and split is done if required
+            int key_pos = curr_data_node->parent->insert_key(*(new_data_node->keys.begin()));
+            curr_data_node->parent->insert_child(key_pos + 1, new_data_node);
+            if (curr_data_node->parent->get_n_children() == order)
+            {
+                curr_data_node->parent->split(order);
+            }
+        }
+        // if this is the root node, we need a new InternalNode to become the parent
+        else
+        {
+            InternalNode *new_root = new InternalNode();
+            new_root->insert_key(*new_data_node->keys.begin());
+            new_root->insert_child(0, curr_data_node);
+            new_root->insert_child(1, new_data_node);
+            curr_data_node->set_parent(new_root);
+            new_data_node->set_parent(new_root);
+        }
+    }
 }
 
 std::string BPlusTree::search(float key)
