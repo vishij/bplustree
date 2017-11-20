@@ -196,6 +196,7 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float key_start, fl
         }
         curr_data_node = curr_data_node->right;
     }
+    return search_output_arr;
 }
 
 void BPlusTree::print_tree_bfs()
@@ -216,13 +217,12 @@ void BPlusTree::print_tree_bfs()
         }
         curr_node->print_all_keys();
     }
-    return search_output_arr;
 }
 
 // TODO remove this temporary method
 void BPlusTree::print_all_keys()
 {
-    for (DataNode *dn = head; dn != nullptr; dn = dn->get_right())
+    for (DataNode *dn = head; dn != nullptr; dn = dn->right)
     {
         dn->print_all_keys();
     }
