@@ -34,39 +34,33 @@ void BPlusTree::insert(float key_to_insert, std::string value) {
         }
     }
     std::cout << "Trying to insert in DataNode..." << std::endl;
-    static_cast<DataNode*>(curr_node)->insert(key_to_insert, value);
+    static_cast<DataNode *>(curr_node)->insert(key_to_insert, value);
     std::cout << "Key " << key_to_insert << " inserted in DataNode sucessfully" << std::endl;
 
-    if (curr_node->get_n_keys() == order)
-    {
+    if (curr_node->get_n_keys() == order) {
         std::cout << "Trying to split DataNode" << std::endl;
-        auto split_result = static_cast<DataNode*>(curr_node)->split(order);
+        auto split_result = static_cast<DataNode *>(curr_node)->split(order);
         std::cout << "DataNode split completed successfully" << std::endl;
 
-        InternalNode *curr_parent = static_cast<InternalNode*>(curr_node->parent);
+        InternalNode *curr_parent = static_cast<InternalNode *>(curr_node->parent);
         bool needs_new_root = true;
-        while (nullptr != curr_parent)
-        {
+        while (nullptr != curr_parent) {
             curr_parent->combine(split_result);
             // we need to split the parent if combine caused it to have "order"
             // no. of children
-            if (curr_parent->get_n_keys() == order)
-            {
+            if (curr_parent->get_n_keys() == order) {
                 split_result = curr_parent->split(order);
                 // curr_node is being updated as it will be used in the if-condition
                 // below when needs_new_root is true
                 curr_node = curr_parent;
-                curr_parent = static_cast<InternalNode*>(curr_node->get_parent());
-            }
-            else
-            {
+                curr_parent = static_cast<InternalNode *>(curr_node->get_parent());
+            } else {
                 needs_new_root = false;
                 break;
             }
         }
 
-        if (needs_new_root)
-        {
+        if (needs_new_root) {
             InternalNode *new_root = split_result.first;
             auto new_root_right_child = split_result.second;
             // remember we didn't make any child/parent associations in DataNode::split?
@@ -146,8 +140,19 @@ std::vector<std::string> BPlusTree::search(float key) {
 
     //after reaching data node, convert the curr_node to type - DataNode
     DataNode *curr_data_node = static_cast<DataNode *>(curr_node);
+    DataNode *curr_data_node_left = curr_data_node->left;
+//    //values from
 
-    //values from
+    while (curr_data_node_left != nullptr) {
+        for (std::vector<float>::const_iterator i = curr_data_node_left->keys.begin();
+             i < curr_data_node_left->keys.end(); ++i) {
+            if (key == *i) {
+                search_output_arr.push_back(curr_data_node_left->values.at(i - curr_data_node_left->keys.begin()));
+            }
+        }
+        curr_data_node_left = curr_data_node_left->left;
+    }
+
     while (curr_data_node != nullptr) {
         for (std::vector<float>::const_iterator i = curr_data_node->keys.begin(); i < curr_data_node->keys.end(); ++i) {
             if (key == *i) {
@@ -156,6 +161,7 @@ std::vector<std::string> BPlusTree::search(float key) {
         }
         curr_data_node = curr_data_node->right;
     }
+
     return search_output_arr;
 }
 
@@ -191,7 +197,8 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float key_start, fl
     while (curr_data_node != nullptr) {
         for (std::vector<float>::const_iterator i = curr_data_node->keys.begin(); i < curr_data_node->keys.end(); ++i) {
             if ((*i >= key_start) && (*i <= key_end)) {
-                search_output_arr.push_back(std::make_pair(*i, curr_data_node->values.at(i - curr_data_node->keys.begin())));
+                search_output_arr.push_back(
+                        std::make_pair(*i, curr_data_node->values.at(i - curr_data_node->keys.begin())));
             }
         }
         curr_data_node = curr_data_node->right;
@@ -199,19 +206,15 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float key_start, fl
     return search_output_arr;
 }
 
-void BPlusTree::print_tree_bfs()
-{
-    std::queue<Node*> q;
+void BPlusTree::print_tree_bfs() {
+    std::queue<Node *> q;
     q.push(root);
 
-    while (!q.empty())
-    {
-        InternalNode *curr_node = static_cast<InternalNode*>(q.front());
+    while (!q.empty()) {
+        InternalNode *curr_node = static_cast<InternalNode *>(q.front());
         q.pop();
-        for (auto const &child: curr_node->child_ptrs)
-        {
-            if (child->get_type().compare("DATA") != 0)
-            {
+        for (auto const &child: curr_node->child_ptrs) {
+            if (child->get_type().compare("DATA") != 0) {
                 q.push(child);
             }
         }
@@ -220,10 +223,8 @@ void BPlusTree::print_tree_bfs()
 }
 
 // TODO remove this temporary method
-void BPlusTree::print_all_keys()
-{
-    for (DataNode *dn = head; dn != nullptr; dn = dn->right)
-    {
+void BPlusTree::print_all_keys() {
+    for (DataNode *dn = head; dn != nullptr; dn = dn->right) {
         dn->print_all_keys();
     }
 }

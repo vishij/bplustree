@@ -5,8 +5,7 @@
 #include <string>
 #include "node.hpp"
 
-class BPlusTree
-{
+class BPlusTree {
 private:
     Node *root;
     int order;
@@ -18,8 +17,11 @@ private:
 
 public:
     void initialise(int order);
+
     int get_order();
+
     void insert(float key, std::string value);
+
     std::vector<std::string> search(float key);
 
     /*
