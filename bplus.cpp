@@ -41,7 +41,6 @@ void BPlusTree::insert(float key_to_insert, std::string value) {
     {
         std::cout << "Trying to split DataNode" << std::endl;
         new_data_node = curr_data_node->split(order);
-        new_data_node->set_parent(curr_data_node->get_parent());
         std::cout << "DataNode split completed successfully" << std::endl;
 
         // if this is not the root node, we need to handle insert and (possibly)
@@ -66,6 +65,7 @@ void BPlusTree::insert(float key_to_insert, std::string value) {
             new_root->insert_child(1, new_data_node);
             curr_data_node->set_parent(new_root);
             new_data_node->set_parent(new_root);
+            root = new_root;
         }
     }
 }
