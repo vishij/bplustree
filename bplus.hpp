@@ -32,6 +32,10 @@ public:
     // useful only for internal debugging purposes
     // TODO remove before submission
     void print_all_keys();
+
+    // useful only for internal debugging purposes
+    // TODO remove before submission
+    void print_tree_bfs();
 };
 
 #endif

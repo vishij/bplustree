@@ -1,4 +1,6 @@
 #include <string>
+#include <queue>
+
 #include "bplus.hpp"
 
 void BPlusTree::initialise(int order) {
@@ -31,42 +33,79 @@ void BPlusTree::insert(float key_to_insert, std::string value) {
             }
         }
     }
-    DataNode *curr_data_node = static_cast<DataNode *>(curr_node);
     std::cout << "Trying to insert in DataNode..." << std::endl;
-    curr_data_node->insert(key_to_insert, value);
-    std::cout << "Key inserted in DataNode sucessfully" << std::endl;
+    static_cast<DataNode*>(curr_node)->insert(key_to_insert, value);
+    std::cout << "Key " << key_to_insert << " inserted in DataNode sucessfully" << std::endl;
 
-    DataNode *new_data_node;
-    if (curr_data_node->get_n_keys() == order)
+    if (curr_node->get_n_keys() == order)
     {
         std::cout << "Trying to split DataNode" << std::endl;
-        new_data_node = curr_data_node->split(order);
+        auto split_result = static_cast<DataNode*>(curr_node)->split(order);
         std::cout << "DataNode split completed successfully" << std::endl;
 
+        InternalNode *curr_parent = static_cast<InternalNode*>(curr_node->parent);
+        bool needs_new_root = true;
+        while (nullptr != curr_parent)
+        {
+            curr_parent->combine(split_result);
+            // we need to split the parent if combine caused it to have "order"
+            // no. of children
+            if (curr_parent->get_n_keys() == order)
+            {
+                split_result = curr_parent->split(order);
+                // curr_node is being updated as it will be used in the if-condition
+                // below when needs_new_root is true
+                curr_node = curr_parent;
+                curr_parent = static_cast<InternalNode*>(curr_node->get_parent());
+            }
+            else
+            {
+                needs_new_root = false;
+                break;
+            }
+        }
+
+        if (needs_new_root)
+        {
+            InternalNode *new_root = split_result.first;
+            auto new_root_right_child = split_result.second;
+            // remember we didn't make any child/parent associations in DataNode::split?
+            // we need to make them here
+            new_root->insert_child(0, curr_node); // this is why we were updating curr_node in the while loop above
+            new_root->insert_child(1, new_root_right_child);
+            curr_node->set_parent(new_root);
+            new_root_right_child->set_parent(new_root);
+            root = new_root;
+        }
+        /*
         // if this is not the root node, we need to handle insert and (possibly)
         // split on its ancestors, up to the root
         if (nullptr != curr_data_node->parent)
         {
-            // first key from new DataNode gets inserted into its parent
-            // and split is done if required
-            int key_pos = curr_data_node->parent->insert_key(*(new_data_node->keys.begin()));
-            curr_data_node->parent->insert_child(key_pos + 1, new_data_node);
-            if (curr_data_node->parent->get_n_children() == order)
+            // combine the result of the split with the old DataNode's parent
+            // and split it (the parent) if required
+            auto curr_parent = curr_data_node->parent;
+            while ((nullptr != curr_parent) && (curr_parent->get_n_children() == order))
             {
-                curr_data_node->parent->split(order);
+                curr_parent->combine(split_result);
+                auto in_split_result = curr_parent->split(order);
+                curr_parent = curr_parent->get_parent();
             }
         }
-        // if this is the root node, we need a new InternalNode to become the parent
+        // if this is the root node, we need the new InternalNode to become the parent
         else
         {
-            InternalNode *new_root = new InternalNode();
-            new_root->insert_key(*new_data_node->keys.begin());
+            InternalNode *new_root = split_result.first;
+
+            // remember we didn't make any child/parent associations in DataNode::split?
+            // we need to make them here
             new_root->insert_child(0, curr_data_node);
             new_root->insert_child(1, new_data_node);
             curr_data_node->set_parent(new_root);
             new_data_node->set_parent(new_root);
             root = new_root;
         }
+         */
     }
 }
 
@@ -117,18 +156,39 @@ std::vector<std::string> BPlusTree::search(float key) {
     return search_output_arr;
 }
 
-/*
- * Ranged search
- *
- * Search for key such that key_start <= key <= key_end
- */
+    /*
+     * Ranged search
+     *
+     * Search for key such that key_start <= key <= key_end
+     */
     std::string BPlusTree::search(float key_start, float key_end) {
         return nullptr;
     }
 
-// TODO remove this temporary method
+    // TODO remove this temporary method
     void BPlusTree::print_all_keys() {
-        for (DataNode *dn = head; dn != nullptr; dn = dn->get_right()) {
+        for (DataNode *dn = head; dn != nullptr; dn = dn->right)
+        {
             dn->print_all_keys();
+        }
+    }
+
+    void BPlusTree::print_tree_bfs()
+    {
+        std::queue<Node*> q;
+        q.push(root);
+
+        while (!q.empty())
+        {
+            InternalNode *curr_node = static_cast<InternalNode*>(q.front());
+            q.pop();
+            for (auto const &child: curr_node->child_ptrs)
+            {
+                if (child->get_type().compare("DATA") != 0)
+                {
+                    q.push(child);
+                }
+            }
+            curr_node->print_all_keys();
         }
     }
