@@ -27,7 +27,7 @@ public:
      *
      * Search for key such that key_start <= key <= key_end
      */
-    std::string search(float key_start, float key_end);
+    std::vector<std::pair<float, std::string>> search(float key_start, float key_end);
 
     // useful only for internal debugging purposes
     // TODO remove before submission

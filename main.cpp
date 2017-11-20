@@ -14,19 +14,31 @@ int main(int argc, char** argv)
     }
 
     // ifstream is used to read input_file
-    std::ifstream infile(input_file);
+    std::ifstream inf(input_file);
 
     // If output file stream couldn't be read
-    if (!infile)
+    if (!inf)
     {
         // Print an error and exit
         std::cerr << "ERROR! " << input_file << " could not be opened for reading!" << std::endl;
         exit(1);
     }
 
+    //search & write output to file
+    std::ofstream outf("output_file.txt");
+    // If we couldn't open the output file stream for writing
+    if (!outf)
+    {
+        // Print an error and exit
+        std::cerr << "ERROR! output_file.txt could not be opened for writing!" << std::endl;
+        exit(1);
+    }
+
+    std::cout << outf.is_open() << std::endl;
+
     //read first line from file - order of B+ tree = m
     std::string order;
-    getline(infile, order);
+    getline(inf, order);
         //TODO: remove comment
     std::cout << "order : " << order << std::endl;
     auto bptree = new BPlusTree();
@@ -35,7 +47,7 @@ int main(int argc, char** argv)
     int current_line = 0;
     //TODO: add code to read values
     // Read rest of the file skipping 1st  line and parse the input
-    while (infile)
+    while (inf)
     {
         if(current_line == 0) {
             current_line++;
@@ -43,7 +55,7 @@ int main(int argc, char** argv)
             //TODO: remove print
             // read stuff from the file into a string and print it
             std::string str_input;
-            infile >> str_input;
+            inf >> str_input;
 //            std::string parsed_input[3];
             std::string delimiter1 = "(";
             std::string delimiter2 = ",";
@@ -74,6 +86,7 @@ int main(int argc, char** argv)
                     str_input.erase(0, pos + delimiter3.length());
                 } else {
                     // range search
+                    std::cout << "range search key : " << std::endl;
                     pos = str_input.find(delimiter2);
                     std::cout<< "pos : " << pos << std::endl;
                     input1 = str_input.substr(0, pos);
@@ -87,28 +100,30 @@ int main(int argc, char** argv)
                     str_input.erase(0, pos + delimiter3.length());
                 }
 
-                //search & write output to file
-                std::ofstream outfile("output_file.txt");
                 float key1 = atof(input1.c_str());
                 if(input2 == "") {
                     std::cout << "ATOF :" << atof(input1.c_str()) << std::endl;
                     std::vector<std::string> values  = bptree->search(key1);
                     for(std::vector<std::string>::const_iterator i = values.begin(); i < values.end(); ++i){
-                        std::cout << "SEARCH VALUES: " << *i;
+                        outf << *i;
+                        if(i < values.end()-1)
+                            outf << ",";
+                        else
+                            outf << std::endl;
+                        std::cout << "SEARCH VALUES: " << *i << std::endl;
                     }
                 } else {
                     float key2 = atof(input2.c_str());
-                    bptree->search(key1, key2);
+                    std::vector<std::pair<float, std::string>> values  = bptree->search(key1, key2);
+                    for(std::vector<std::pair<float, std::string>>::const_iterator i = values.begin(); i < values.end(); ++i){
+                        outf << "(" << values[i-values.begin()].first << "," << values[i-values.begin()].second << ")";
+                        if(i < values.end()-1)
+                            outf << ",";
+                        else
+                            outf << std::endl;
+                        std::cout << "SEARCH VALUES: " << values[i-values.begin()].first << ", " << values[i-values.begin()].second << std::endl;
+                    }
                 }
-
-
-                // If we couldn't open the output file stream for writing
-//                if (!outfile)
-//                {
-//                    // Print an error and exit
-//                    std::cerr << "ERROR! output_file.txt could not be opened for writing!" << std::endl;
-//                    exit(1);
-//                }
 
             } else {
                 pos = str_input.find(delimiter2);
@@ -146,8 +161,8 @@ int main(int argc, char** argv)
 //    }
 
     // TODO: write data to output
-//    outfile << "This is line 1" << endl;
-//    outfile << "This is line 2" << endl;
+//    outf << "This is line 1" << std::endl;
+//    outf<< "This is line 2" << std::endl;
 
 
    /* auto bptree = new BPlusTree();
