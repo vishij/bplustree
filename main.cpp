@@ -74,6 +74,7 @@ int main(int argc, char** argv)
                     str_input.erase(0, pos + delimiter3.length());
                 } else {
                     // range search
+                    std::cout << "range search key : " << std::endl;
                     pos = str_input.find(delimiter2);
                     std::cout<< "pos : " << pos << std::endl;
                     input1 = str_input.substr(0, pos);
@@ -94,11 +95,14 @@ int main(int argc, char** argv)
                     std::cout << "ATOF :" << atof(input1.c_str()) << std::endl;
                     std::vector<std::string> values  = bptree->search(key1);
                     for(std::vector<std::string>::const_iterator i = values.begin(); i < values.end(); ++i){
-                        std::cout << "SEARCH VALUES: " << *i;
+                        std::cout << "SEARCH VALUES: " << *i << std::endl;
                     }
                 } else {
                     float key2 = atof(input2.c_str());
-                    bptree->search(key1, key2);
+                    std::vector<std::pair<float, std::string>> values  = bptree->search(key1, key2);
+                    for(std::vector<std::pair<float, std::string>>::const_iterator i = values.begin(); i < values.end(); ++i){
+                        std::cout << "SEARCH VALUES: " << values[i-values.begin()].first << ", " << values[i-values.begin()].second << std::endl;
+                    }
                 }
 
 
