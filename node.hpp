@@ -85,6 +85,8 @@ public:
         InternalNode *new_right = new InternalNode();
         new_right->keys = std::vector<float>(keys.begin() + n_eles_in_left + 1, keys.end());
         new_right->child_ptrs = std::vector<Node*>(child_ptrs.begin() + n_eles_in_left + 1, child_ptrs.end());
+
+        // change the parent pointer for each child moved into the new right node
         for (auto child: new_right->child_ptrs)
         {
             child->set_parent(new_right);
