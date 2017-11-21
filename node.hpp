@@ -57,12 +57,12 @@ public:
 
     // combine the internal node with an InternalNode which was formed as a result of a split
     void combine(std::pair<InternalNode *, Node *> split_result) {
-        auto to_merge_with = split_result.first;
-        auto its_child = split_result.second;
+        auto nodes_to_merge = split_result.first;
+        auto child_node = split_result.second;
 
-        int keypos = insert_key(*to_merge_with->keys.begin());
-        insert_child(keypos + 1, its_child);
-        its_child->set_parent(this);
+        int key_position = insert_key(*nodes_to_merge->keys.begin());
+        insert_child(key_position + 1, child_node);
+        child_node->set_parent(this);
     }
 
     /**
