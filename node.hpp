@@ -8,13 +8,17 @@
 #include <cfloat>
 #include <iostream>
 
-// Superclass to enable InternalNode to point to either kind of Node
+/**
+ * Superclass Node to enable InternalNode to point to either kind of Node - InternalNode or DataNode
+ */
+
 class Node {
+
 protected:
-    // keys should always have the last value of FLT_MAX as GUARD VALUE
-    // because we will be inserting elements by checking left
-    // to right and this covers the corner case where the element
-    // being inserted is the largest one
+    /*  Last value for keys assigned as FLT_MAX as max value,
+     * to cover the corner case where the element being inserted is the largest one
+     * as the insert works by checking elements left to right*/
+
     std::vector<float> keys = {FLT_MAX};
     Node *parent = nullptr;
 
@@ -25,17 +29,8 @@ public:
 
     virtual void set_parent(Node *node) { parent = node; }
 
-    // IMPORTANT! We are subtracting 1 because of the FLT_MAX guard value
+    // Subtract 1 because of the FLT_MAX as max/guard value
     int get_n_keys() { return keys.size() - 1; }
-
-    // TODO remove this temporary method
-    virtual void print_all_keys() {
-        for (std::vector<float>::const_iterator i = keys.begin(), j = --keys.end(); i < j; ++i) {
-            std::cout << *i << " ";
-        }
-        std::cout << std::endl;
-
-    }
 
     friend class BPlusTree;
 };
@@ -152,102 +147,61 @@ private:
 public:
     virtual std::string get_type() { return "DATA"; }
 
-    virtual void print_all_keys() override {
-        for (std::vector<float>::const_iterator i = keys.begin(), j = --keys.end(); i < j; ++i) {
-            std::cout << "KEY VAL PAIR: " << *i << ",  " << values.at(i - keys.begin()) << std::endl;
-        }
-        std::cout << std::endl;
-
-    }
-
+    /**
+     * Insert K-V pair
+     * @param key
+     * @param value
+     */
     void insert(float key, std::string value) {
         for (std::vector<float>::iterator i = keys.begin(); i < keys.end(); ++i) {
             if (key < *i) {
-                // IMPORTANT!! Don't forget to capture the new value of the
-                // iterator after insertion
+                // Don't forget to capture the new value of the iterator after insertion
                 i = keys.insert(i, key);
-                std::cout << "Key insertion successful in DataNode" << std::endl;
                 // insert value at ith position
                 values.insert(values.begin() + (i - keys.begin()), value);
-                std::cout << "Value insertion successful in DataNode" << std::endl;
                 break;
             }
         }
     }
 
-    // split on the basis of the given order
+    /**
+     * Split on the basis of the given order - when no. of pairs > m-1 for any node (internal or external)
+     * @param order
+     * @return
+     */
     std::pair<InternalNode *, Node *> split(int order) {
-        // IMPORTANT! we are doing ceil(m/2) - 2 instead of ceil(m/2) - 1
-        // because our nodes are 0-indexed (so first 2 children means index
-        // of last child should be 1)
-        std::cout << "order for split is: " << order << std::endl;
+        /* ceil(m/2) - 2 instead of ceil(m/2) - 1 because nodes are 0-indexed
+         * (In case of m = 3 and split at 3, split at 0, (1,2)) */
         std::vector<float>::iterator old_dn_keys_end = keys.begin() + ceil(float(order) / 2) - 2;
         std::vector<std::string>::iterator old_dn_values_end = values.begin() + ceil(float(order) / 2) - 2;
 
         // create new DataNode with subset of larger keys and values
         DataNode *new_dn = new DataNode();
         new_dn->keys = std::vector<float>(old_dn_keys_end + 1, keys.end());
-        std::cout << "new_dn keys made successfully" << std::endl;
         new_dn->values = std::vector<std::string>(old_dn_values_end + 1, values.end());
 
-        // truncate the smaller subset in the existing node
-        // IMPORTANT! Be sure to add 1 in resize because vectors are 0-indexed
+        /* Truncate/resize the smaller subset in the existing node
+         * NOTE: added 1 in resize because vectors are 0-indexed */
         keys.resize(old_dn_keys_end - keys.begin() + 1);
         keys.push_back(FLT_MAX);
         values.resize(old_dn_keys_end - keys.begin() + 1);
         values.push_back("END_MARKER");
 
-        // add new node into the doubly linked list
+        // add new node into doubly linked list
         new_dn->right = right;
         new_dn->left = this;
         right = new_dn;
 
-        // new parent for the split DataNode
-        // note that it is not necessary to set up the child and parent
-        // pointers here (BPlusTree will do it) since we are returning a pair
-        // which implicitly means that right DataNode in the pair is the child
+        /* New parent for the split DataNode.
+         * NOTE: No need to set the child and parent pointers here (BPlusTree does it)
+         * as the pair returned implicitly means that right DataNode in the pair is the child */
         InternalNode *new_in = new InternalNode();
         new_in->insert_key(*new_dn->keys.begin());
 
         return std::pair<InternalNode *, DataNode *>(new_in, new_dn);
     }
 
-    /*
-    // split on the basis of given order
-    // TODO test if this needs to be made virtual
-    DataNode* split(int order)
-    {
-        // IMPORTANT! we are doing ceil(m/2) - 2 instead of ceil(m/2) - 1
-        // because our nodes are 0-indexed (so first 2 children means index
-        // of last child should be 1)
-        std::cout << "order for split is: " << order << std::endl;
-        std::vector<float>::const_iterator old_dn_keys_end = keys.begin() + ceil(order / 2) - 2;
-        std::vector<std::string>::const_iterator old_dn_values_end = values.begin() + ceil(order / 2) - 2;
-
-        // create new DataNode with subset of larger keys and values
-        DataNode *new_dn = new DataNode();
-        new_dn->keys = std::vector<float>(old_dn_keys_end + 1, keys.end());
-        std::cout << "new_dn keys made successfully" << std::endl;
-        new_dn->values = std::vector<std::string>(old_dn_values_end + 1, values.end());
-
-        // truncate the smaller subset in the existing node
-        // IMPORTANT! Be sure to add 1 in resize because vectors are 0-indexed
-        keys.resize(old_dn_keys_end - keys.begin() + 1);
-        keys.push_back(FLT_MAX);
-        values.resize(old_dn_keys_end - keys.begin() + 1);
-        values.push_back("END_MARKER");
-
-        // add new node into the doubly linked list
-        new_dn->right = right;
-        new_dn->left = this;
-        right = new_dn;
-
-        return new_dn;
-    }
-     */
-
     friend class BPlusTree;
-
     friend class InternalNode;
 };
 

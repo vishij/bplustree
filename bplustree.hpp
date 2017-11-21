@@ -24,20 +24,13 @@ public:
 
     std::vector<std::string> search(float key);
 
-    /*
-     * Ranged search
-     *
-     * Search for key such that key_start <= key <= key_end
+    /**
+     * Range search - Search for all pairs such that key_start <= key <= key_end
+     * @param key_start
+     * @param key_end
+     * @return
      */
     std::vector<std::pair<float, std::string>> search(float key_start, float key_end);
-
-    // useful only for internal debugging purposes
-    // TODO remove before submission
-    void print_all_keys();
-
-    // useful only for internal debugging purposes
-    // TODO remove before submission
-    void print_tree_bfs();
 };
 
 #endif
