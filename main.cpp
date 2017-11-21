@@ -3,7 +3,7 @@
 #include "bplustree.hpp"
 
 /**
- *.
+ * Main function
  * @param argc
  * @param argv
  * @return
