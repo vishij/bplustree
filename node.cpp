@@ -17,7 +17,7 @@ class Node {
 protected:
     /*  Last value for keys assigned as FLT_MAX as max value,
      * to cover the corner case where the element being inserted is the largest one
-     * as the insert works by checking elements left to right*/
+     * as the insert works by checking elements left to right */
 
     std::vector<float> keys = {FLT_MAX};
     Node *parent = nullptr;

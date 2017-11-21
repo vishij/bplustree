@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include "node.hpp"
+#include "node.cpp"
 
 /**
  * Header file for B+ Tree.
