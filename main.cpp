@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
             //TODO: optimize code; can we use something like INTEGER_MAX for comparison in if statement??
             // For search there can be one or two keys as input, array initialized depending on that
             if (operation_type == "Search") {
-                //no comma
+                //no comma => no 2nd input in case of search, ie, exact search
                 if (string_input.find(delimiter2) > (size_t) 1000) {
                     position = string_input.find(delimiter3);
                     input1 = string_input.substr(0, position);
