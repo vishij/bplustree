@@ -17,19 +17,19 @@ int main(int argc, char **argv) {
     }
 
     // ifstream is used to read input_file
-    std::ifstream inf(input_file);
+    std::ifstream infile(input_file);
 
     // If output file stream couldn't be read
-    if (!inf) {
+    if (!infile) {
         // Print an error and exit
         std::cerr << "ERROR! " << input_file << " could not be opened for reading!" << std::endl;
         exit(1);
     }
 
     //search & write output to file
-    std::ofstream outf("output_file.txt");
+    std::ofstream outfile("output_file.txt");
     // If we couldn't open the output file stream for writing
-    if (!outf) {
+    if (!outfile) {
         // Print an error and exit
         std::cerr << "ERROR! output_file.txt could not be opened for writing!" << std::endl;
         exit(1);
@@ -37,19 +37,19 @@ int main(int argc, char **argv) {
 
     //read first line from file - order of B+ tree = m
     std::string order;
-    getline(inf, order);
+    getline(infile, order);
     auto bplustree = new BPlusTree();
     bplustree->initialise(atoi(order.c_str()));
 
     int current_line = 0;
     // Read rest of the file skipping 1st line and parse the input
-    while (inf) {
+    while (infile) {
         if (current_line == 0) {
             current_line++;
         } else {
             // read data from the file into a string
             std::string string_input;
-            inf >> string_input;
+            infile >> string_input;
 
             std::string delimiter1 = "(";
             std::string delimiter2 = ",";
@@ -89,14 +89,14 @@ int main(int argc, char **argv) {
                     std::vector<std::string> values = bplustree->search(key1);
                     // if search yields no result, then add NULL to output file
                     if (values.empty()) {
-                        outf << "NULL" << std::endl;
+                        outfile << "NULL" << std::endl;
                     } else {
                         for (std::vector<std::string>::const_iterator i = values.begin(); i < values.end(); ++i) {
-                            outf << *i;
+                            outfile << *i;
                             if (i < values.end() - 1)
-                                outf << ","; // add comma only if value is not last value
+                                outfile << ","; // add comma only if value is not last value
                             else
-                                outf << std::endl;
+                                outfile << std::endl;
                         }
                     }
                 } else {
@@ -104,16 +104,16 @@ int main(int argc, char **argv) {
                     std::vector<std::pair<float, std::string>> values = bplustree->search(key1, key2);
                     // if search yields no result, then add NULL to output file
                     if (values.empty()) {
-                        outf << "NULL" << std::endl;
+                        outfile << "NULL" << std::endl;
                     } else {
                         for (std::vector<std::pair<float, std::string>>::const_iterator i = values.begin();
                              i < values.end(); ++i) {
-                            outf << "(" << values[i - values.begin()].first << "," << values[i - values.begin()].second
+                            outfile << "(" << values[i - values.begin()].first << "," << values[i - values.begin()].second
                                  << ")";
                             if (i < values.end() - 1)
-                                outf << ","; // add comma only if value is not last value
+                                outfile << ","; // add comma only if value is not last value
                             else
-                                outf << std::endl;
+                                outfile << std::endl;
                         }
                     }
 
