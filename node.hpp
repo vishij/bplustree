@@ -6,6 +6,7 @@
 #include <cmath>
 #include <utility>
 #include <cfloat>
+#include <iostream>
 
 // Superclass to enable InternalNode to point to either kind of Node
 class Node {
