@@ -181,8 +181,8 @@ public:
         // because our nodes are 0-indexed (so first 2 children means index
         // of last child should be 1)
         std::cout << "order for split is: " << order << std::endl;
-        std::vector<float>::const_iterator old_dn_keys_end = keys.begin() + ceil(float(order) / 2) - 2;
-        std::vector<std::string>::const_iterator old_dn_values_end = values.begin() + ceil(float(order) / 2) - 2;
+        std::vector<float>::iterator old_dn_keys_end = keys.begin() + ceil(float(order) / 2) - 2;
+        std::vector<std::string>::iterator old_dn_values_end = values.begin() + ceil(float(order) / 2) - 2;
 
         // create new DataNode with subset of larger keys and values
         DataNode *new_dn = new DataNode();
