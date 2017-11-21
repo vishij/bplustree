@@ -1,10 +1,6 @@
-#ifndef NODE_HPP_
-#define NODE_HPP_
-
 #include <string>
 #include <vector>
 #include <cmath>
-#include <utility>
 #include <cfloat>
 #include <iostream>
 
@@ -39,12 +35,16 @@ class InternalNode : public Node {
 
 protected:
     std::vector<Node *> child_ptrs;
-    InternalNode *parent = nullptr;
+//    InternalNode *parent = nullptr;
 
 public:
     virtual std::string get_type() { return "INTERNAL"; }
 
-    // returns the index where the key was inserted which is used to add a child pointer
+    /**
+     * Ceturns the index where the key was inserted which is used to add a child pointer
+     * @param key
+     * @return
+     */
     int insert_key(float key) {
         for (std::vector<float>::iterator i = keys.begin(); i < keys.end(); ++i) {
             if (key < *i) {
@@ -55,7 +55,10 @@ public:
         }
     }
 
-    // combine the internal node with an InternalNode which was formed as a result of a split
+    /**
+     * Combine the parent internal node with a given InternalNode which was formed as a result of a split
+     * @param split_result
+     */
     void combine(std::pair<InternalNode *, Node *> split_result) {
         auto nodes_to_merge = split_result.first;
         auto child_node = split_result.second;
@@ -66,9 +69,9 @@ public:
     }
 
     /**
-     * Split on the basis of given order
+     * Split a node on the basis of given order
      * @param order
-     * @return pair of Nodes - InternalNode-InternalNode, or InternalNode-DataNode
+     * @return pair of Nodes - InternalNode-InternalNode
      */
     std::pair<InternalNode *, Node *> split(int order) {
         // NOTE: Subtracted keys.begin() from an iterator returned from the first part
@@ -84,7 +87,7 @@ public:
             child->set_parent(new_right_node);
         }
 
-        // new InternalNode with the "middle" (so to speak) element
+        // new InternalNode with the "middle" element
         InternalNode *new_middle_node = new InternalNode();
         new_middle_node->insert_key(*(keys.begin() + elements_in_left));
 
@@ -100,7 +103,6 @@ public:
     }
 
     // temp method
-    // TODO remove if not required
     void insert_child(int position, Node *child_ptr) {
         child_ptrs.insert(child_ptrs.begin() + position, child_ptr);
     }
@@ -122,7 +124,7 @@ public:
     virtual std::string get_type() { return "DATA"; }
 
     /**
-     * Insert K-V pair
+     * Insert K-V pair in a given node
      * @param key
      * @param value
      */
@@ -139,9 +141,9 @@ public:
     }
 
     /**
-     * Split on the basis of the given order - when no. of pairs > m-1 for any node (internal or external)
+     * Splits a DataNode on the basis of the given order - when no. of pairs > m-1 for any node
      * @param order
-     * @return pair of Nodes - InternalNode-InternalNode, or InternalNode-DataNode
+     * @return pair of Nodes - InternalNode-DataNode
      */
     std::pair<InternalNode *, Node *> split(int order) {
         /* ceil(m/2) - 2 instead of ceil(m/2) - 1 because nodes are 0-indexed
@@ -178,5 +180,3 @@ public:
     friend class BPlusTree;
     friend class InternalNode;
 };
-
-#endif
