@@ -30,7 +30,7 @@ public:
     virtual void set_parent(Node *node) { parent = node; }
 
     // Subtract 1 because of the FLT_MAX as max/guard value
-    int get_n_keys() { return keys.size() - 1; }
+    int get_no_of_keys() { return keys.size() - 1; }
 
     friend class BPlusTree;
 };

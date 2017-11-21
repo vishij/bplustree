@@ -21,17 +21,17 @@ private:
 public:
     void initialise(int order);
 
-    void insert(float key, std::string value);
+    void insert(float insert_key, std::string value);
 
     std::vector<std::string> search(float key);
 
     /**
      * Range search - Search for all pairs such that key_start <= key <= key_end
-     * @param key_start
-     * @param key_end
+     * @param start_key
+     * @param end_key
      * @return
      */
-    std::vector<std::pair<float, std::string>> search(float key_start, float key_end);
+    std::vector<std::pair<float, std::string>> search(float start_key, float end_key);
 };
 
 #endif
