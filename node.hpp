@@ -36,6 +36,7 @@ public:
 };
 
 class InternalNode : public Node {
+
 protected:
     std::vector<Node *> child_ptrs;
     InternalNode *parent = nullptr;
@@ -43,20 +44,18 @@ protected:
 public:
     virtual std::string get_type() { return "INTERNAL"; }
 
-    // returns the index where the key was inserted
-    // this index is used to add a child pointer
+    // returns the index where the key was inserted which is used to add a child pointer
     int insert_key(float key) {
         for (std::vector<float>::iterator i = keys.begin(); i < keys.end(); ++i) {
             if (key < *i) {
-                // DON'T FORGET TO CAPTURE NEW VALUE OF i!
+                // capture value of i
                 i = keys.insert(i, key);
                 return i - keys.begin();
             }
         }
     }
 
-    // combine this node with an InternalNode which was formed as a result
-    // of a split
+    // combine the internal node with an InternalNode which was formed as a result of a split
     void combine(std::pair<InternalNode *, Node *> split_result) {
         auto to_merge_with = split_result.first;
         auto its_child = split_result.second;
@@ -66,78 +65,53 @@ public:
         its_child->set_parent(this);
     }
 
+    /**
+     * Split on the basis of given order
+     * @param order
+     * @return pair of Nodes - InternalNode-InternalNode, or InternalNode-DataNode
+     */
     std::pair<InternalNode *, Node *> split(int order) {
-        // This code might be misleading. Keep in mind that we are subtracting keys.begin() from an iterator returned from the first part.
-        int n_eles_in_left = (keys.begin() + (ceil(float(order) / 2) - 1)) - keys.begin();
+        // NOTE: Subtracted keys.begin() from an iterator returned from the first part
+        int elements_in_left = (keys.begin() + (ceil(float(order) / 2) - 1)) - keys.begin();
 
         // new InternalNode with the "right" subset of elements
-        InternalNode *new_right = new InternalNode();
-        new_right->keys = std::vector<float>(keys.begin() + n_eles_in_left + 1, keys.end());
-        new_right->child_ptrs = std::vector<Node *>(child_ptrs.begin() + n_eles_in_left + 1, child_ptrs.end());
+        InternalNode *new_right_node = new InternalNode();
+        new_right_node->keys = std::vector<float>(keys.begin() + elements_in_left + 1, keys.end());
+        new_right_node->child_ptrs = std::vector<Node *>(child_ptrs.begin() + elements_in_left + 1, child_ptrs.end());
 
         // change the parent pointer for each child moved into the new right node
-        for (auto child: new_right->child_ptrs) {
-            child->set_parent(new_right);
+        for (auto child: new_right_node->child_ptrs) {
+            child->set_parent(new_right_node);
         }
 
         // new InternalNode with the "middle" (so to speak) element
-        InternalNode *new_middle = new InternalNode();
-        new_middle->insert_key(*(keys.begin() + n_eles_in_left));
+        InternalNode *new_middle_node = new InternalNode();
+        new_middle_node->insert_key(*(keys.begin() + elements_in_left));
 
-        // truncate this node's information
-        // IMPORTANT! Be sure to convert n_eles to indices considering the fact
-        // that vectors are 0-indexed
-        keys.resize(n_eles_in_left);
+        // Truncate/resize the node's information. NOTE: convert elements_in_left to indices considering the fact that vectors are 0-indexed
+        keys.resize(elements_in_left);
         keys.push_back(FLT_MAX);
-        child_ptrs.resize(n_eles_in_left + 1);
+        child_ptrs.resize(elements_in_left + 1);
 
-        // new "right" becomes the right child of the new "middle"
-        new_right->parent = new_middle;
+        // new "right" node becomes the right child of the new "middle" node
+        new_right_node->parent = new_middle_node;
 
-        return std::pair<InternalNode *, InternalNode *>(new_middle, new_right);
+        return std::pair<InternalNode *, InternalNode *>(new_middle_node, new_right_node);
     }
 
-    /*
-    // split on the basis of given order
-    // TODO test if this needs to be made virtual
-    InternalNode* split(int order)
-    {
-        // This code might be misleading. Keep in mind that we are subtracting keys.begin() from an iterator returned from the first part.
-        int old_dn_keys_end = (keys.begin() + (ceil(order / 2) - 1)) - keys.begin();
-
-        // new InternalNode with the "right" subset of elements
-        InternalNode *new_right = new InternalNode();
-        new_right->keys = std::vector<float>(keys.begin() + old_dn_keys_end + 2, keys.end());
-        new_right->child_ptrs = std::vector<Node*>(child_ptrs.begin() + old_dn_keys_end + 2, child_ptrs.end());
-
-        // new InternalNode with the "middle" (so to speak) element
-        InternalNode *new_middle = new InternalNode();
-        new_middle->insert_key(*(keys.begin() + old_dn_keys_end + 1));
-
-        // truncate this node's information
-        // IMPORTANT! Be sure to add 1 in resize because vectors are 0-indexed
-        keys.resize(old_dn_keys_end + 1);
-        keys.push_back(FLT_MAX);
-        child_ptrs.resize(old_dn_keys_end + 2);
-
-        // new "right" becomes the right child of the new "middle"
-        new_middle->insert_child(0, nullptr);
-        new_middle->insert_child(1, new_right);
-        new_right->parent = new_middle;
-
-        return new_middle;
-    }
-    */
-
-    // maybe just a temp method
-    // TODO remove if not required after testing
-    void insert_child(int pos, Node *child_ptr) {
-        child_ptrs.insert(child_ptrs.begin() + pos, child_ptr);
+    // temp method
+    // TODO remove if not required
+    void insert_child(int position, Node *child_ptr) {
+        child_ptrs.insert(child_ptrs.begin() + position, child_ptr);
     }
 
     friend class BPlusTree;
 };
 
+/**
+ * Class to represent Leaf Nodes - contain nodes doubly linked list. Nodes internally contain array of data pairs stored.
+ * NOTE: vector of keys is inherited from Node class. Vector of values containing value at index i corresponding to a key at index i
+ */
 class DataNode : public Node {
 private:
     std::vector<std::string> values = {"END_MARKER"};
@@ -155,7 +129,7 @@ public:
     void insert(float key, std::string value) {
         for (std::vector<float>::iterator i = keys.begin(); i < keys.end(); ++i) {
             if (key < *i) {
-                // Don't forget to capture the new value of the iterator after insertion
+                // capture the new value of i (iterator) after insertion for value insertion at that same position
                 i = keys.insert(i, key);
                 // insert value at ith position
                 values.insert(values.begin() + (i - keys.begin()), value);
@@ -167,38 +141,38 @@ public:
     /**
      * Split on the basis of the given order - when no. of pairs > m-1 for any node (internal or external)
      * @param order
-     * @return
+     * @return pair of Nodes - InternalNode-InternalNode, or InternalNode-DataNode
      */
     std::pair<InternalNode *, Node *> split(int order) {
         /* ceil(m/2) - 2 instead of ceil(m/2) - 1 because nodes are 0-indexed
          * (In case of m = 3 and split at 3, split at 0, (1,2)) */
-        std::vector<float>::iterator old_dn_keys_end = keys.begin() + ceil(float(order) / 2) - 2;
-        std::vector<std::string>::iterator old_dn_values_end = values.begin() + ceil(float(order) / 2) - 2;
+        std::vector<float>::iterator old_data_node_end_keys = keys.begin() + ceil(float(order) / 2) - 2;
+        std::vector<std::string>::iterator old_data_node_end_vals = values.begin() + ceil(float(order) / 2) - 2;
 
         // create new DataNode with subset of larger keys and values
-        DataNode *new_dn = new DataNode();
-        new_dn->keys = std::vector<float>(old_dn_keys_end + 1, keys.end());
-        new_dn->values = std::vector<std::string>(old_dn_values_end + 1, values.end());
+        DataNode *new_data_node = new DataNode();
+        new_data_node->keys = std::vector<float>(old_data_node_end_keys + 1, keys.end());
+        new_data_node->values = std::vector<std::string>(old_data_node_end_vals + 1, values.end());
 
         /* Truncate/resize the smaller subset in the existing node
          * NOTE: added 1 in resize because vectors are 0-indexed */
-        keys.resize(old_dn_keys_end - keys.begin() + 1);
+        keys.resize(old_data_node_end_keys - keys.begin() + 1);
         keys.push_back(FLT_MAX);
-        values.resize(old_dn_keys_end - keys.begin() + 1);
+        values.resize(old_data_node_end_keys - keys.begin() + 1);
         values.push_back("END_MARKER");
 
         // add new node into doubly linked list
-        new_dn->right = right;
-        new_dn->left = this;
-        right = new_dn;
+        new_data_node->right = right;
+        new_data_node->left = this;
+        right = new_data_node;
 
         /* New parent for the split DataNode.
          * NOTE: No need to set the child and parent pointers here (BPlusTree does it)
          * as the pair returned implicitly means that right DataNode in the pair is the child */
-        InternalNode *new_in = new InternalNode();
-        new_in->insert_key(*new_dn->keys.begin());
+        InternalNode *new_internal_node = new InternalNode();
+        new_internal_node->insert_key(*new_data_node->keys.begin());
 
-        return std::pair<InternalNode *, DataNode *>(new_in, new_dn);
+        return std::pair<InternalNode *, DataNode *>(new_internal_node, new_data_node);
     }
 
     friend class BPlusTree;

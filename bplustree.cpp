@@ -18,10 +18,6 @@ void BPlusTree::initialise(int order) {
     head = tail = static_cast<DataNode *>(root);
 }
 
-int BPlusTree::get_order() {
-    return order;
-}
-
 /**
  * Insert K-V pair
  * @param key_to_insert
