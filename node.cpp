@@ -38,10 +38,10 @@ protected:
 //    InternalNode *parent = nullptr;
 
 public:
-    virtual std::string get_type() { return "INTERNAL"; }
+    virtual std::string get_type() override { return "INTERNAL"; }
 
     /**
-     * Ceturns the index where the key was inserted which is used to add a child pointer
+     * Returns the index where the key was inserted which is used to add a child pointer
      * @param key
      * @return
      */
@@ -121,7 +121,7 @@ private:
     DataNode *right = nullptr;
 
 public:
-    virtual std::string get_type() { return "DATA"; }
+    virtual std::string get_type() override { return "DATA"; }
 
     /**
      * Insert K-V pair in a given node

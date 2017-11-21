@@ -96,22 +96,30 @@ std::vector<std::string> BPlusTree::search(float key) {
 
     //after reaching data node, convert the curr_node to type - DataNode; to trace nodes from current data node to right of it
     DataNode *current_data_node = static_cast<DataNode *>(current_node);
-    // to trace nodes left to current node
+    // to trace nodes left to current node, as they may have same key as current node
     DataNode *curr_data_node_left = current_data_node->left;
-    while (curr_data_node_left != nullptr) {
+    bool continue_search = true;
+    while (curr_data_node_left != nullptr && continue_search) {
         for (std::vector<float>::const_iterator i = curr_data_node_left->keys.begin();
              i < curr_data_node_left->keys.end(); ++i) {
             if (key == *i) {
                 search_output_values.push_back(curr_data_node_left->values.at(i - curr_data_node_left->keys.begin()));
+            } else if(key > *i) {
+                continue_search = false;
+                break;
             }
         }
         curr_data_node_left = curr_data_node_left->left;
     }
 
-    while (current_data_node != nullptr) {
+    continue_search = true;
+    while (current_data_node != nullptr && continue_search) {
         for (std::vector<float>::const_iterator i = current_data_node->keys.begin(); i < current_data_node->keys.end(); ++i) {
             if (key == *i) {
                 search_output_values.push_back(current_data_node->values.at(i - current_data_node->keys.begin()));
+            } else if(key < *i){
+                continue_search = false;
+                break;
             }
         }
         current_data_node = current_data_node->right;
@@ -146,8 +154,23 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float start_key, fl
 
     //after reaching data node, convert the curr_node to type - DataNode
     DataNode *current_data_node = static_cast<DataNode *>(current_node);
+    // to trace nodes left to current node, as they may have same key as current node
+    DataNode *curr_data_node_left = current_data_node->left;
+    bool continue_search = true;
+    //trace nodes left to current node till a key less than start key is reached
+    while (curr_data_node_left != nullptr && continue_search) {
+        for (std::vector<float>::const_iterator i = curr_data_node_left->keys.begin();
+             i < curr_data_node_left->keys.end(); ++i) {
+            if (start_key == *i) {
+                range_search_output.push_back(std::make_pair(*i, curr_data_node_left->values.at(i - curr_data_node_left->keys.begin())));
+            } else if(start_key > *i){
+                continue_search = false;
+                break;
+            }
+        }
+        curr_data_node_left = curr_data_node_left->left;
+    }
 
-    //values from
     while (current_data_node != nullptr) {
         for (std::vector<float>::const_iterator i = current_data_node->keys.begin(); i < current_data_node->keys.end(); ++i) {
             if ((*i >= start_key) && (*i <= end_key)) {
@@ -157,5 +180,6 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float start_key, fl
         }
         current_data_node = current_data_node->right;
     }
+
     return range_search_output;
 }
