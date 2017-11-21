@@ -5,6 +5,9 @@
 #include <string>
 #include "node.hpp"
 
+/**
+ * Header file for B+ Tree
+ */
 class BPlusTree {
 private:
     Node *root;

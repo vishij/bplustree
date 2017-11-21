@@ -9,7 +9,7 @@
 #include <iostream>
 
 /**
- * Superclass Node to enable InternalNode to point to either kind of Node - InternalNode or DataNode
+ * Superclass Node to enable InternalNode to point to either kind of Node - InternalNode or DataNode.
  */
 
 class Node {

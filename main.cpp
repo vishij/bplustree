@@ -2,6 +2,12 @@
 #include <fstream>
 #include "bplustree.hpp"
 
+/**
+ *
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char **argv) {
 
     std::string input_file = "";

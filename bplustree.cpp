@@ -4,6 +4,10 @@
 
 #include "bplustree.hpp"
 
+/**
+ * Initialise the tree with order = m
+ * @param order
+ */
 void BPlusTree::initialise(int order) {
     /* an internal node can have at most "order" no. of children; order = m
      * i.e., InternalNodes and DataNodes can have at most (order - 1), or m-1 no. of keys */
