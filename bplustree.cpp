@@ -5,7 +5,7 @@
 #include "bplustree.hpp"
 
 /**
- * Initialise the tree with order = m
+ * Initialise the tree with order = m.
  * @param order
  */
 void BPlusTree::initialise(int order) {

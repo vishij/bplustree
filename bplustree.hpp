@@ -6,7 +6,7 @@
 #include "node.hpp"
 
 /**
- * Header file for B+ Tree
+ * Header file for B+ Tree.
  */
 class BPlusTree {
 private:
