@@ -102,11 +102,12 @@ std::vector<std::string> BPlusTree::search(float key) {
     while (curr_data_node_left != nullptr && continue_search_left) {
         for (std::vector<float>::reverse_iterator i = curr_data_node_left->keys.rbegin();
              i < curr_data_node_left->keys.rend(); ++i) {
-            if(key > *i) {
+            if (key == *i) {
+                search_output_values.push_back(curr_data_node_left->values.at(std::distance(i, curr_data_node_left->keys.rend() - 1)));
+            }
+            else if(key > *i) {
                 continue_search_left = false;
                 break;
-            } else if (key == *i) {
-                search_output_values.push_back(curr_data_node_left->values.at(std::distance(i, curr_data_node_left->keys.rend() - 1)));
             }
         }
         curr_data_node_left = curr_data_node_left->left;
@@ -115,11 +116,12 @@ std::vector<std::string> BPlusTree::search(float key) {
     bool continue_search_right = true;
     while (current_data_node != nullptr && continue_search_right) {
         for (std::vector<float>::const_iterator i = current_data_node->keys.begin(); i < current_data_node->keys.end(); ++i) {
-            if(key < *i){
+            if (key == *i) {
+                search_output_values.push_back(current_data_node->values.at(i - current_data_node->keys.begin()));
+            }
+            else if(key < *i){
                 continue_search_right = false;
                 break;
-            } else if (key == *i) {
-                search_output_values.push_back(current_data_node->values.at(i - current_data_node->keys.begin()));
             }
         }
         current_data_node = current_data_node->right;
@@ -159,11 +161,12 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float start_key, fl
     bool continue_search_left = true;
     //trace nodes left to current node till a key less than start key is reached
     while (curr_data_node_left != nullptr && continue_search_left) {
-        for (std::vector<float>::const_iterator i = curr_data_node_left->keys.begin();
-             i < curr_data_node_left->keys.end(); ++i) {
+        for (std::vector<float>::reverse_iterator i = curr_data_node_left->keys.rbegin();
+             i < curr_data_node_left->keys.rend(); ++i) {
             if (start_key == *i) {
-                range_search_output.push_back(std::make_pair(*i, curr_data_node_left->values.at(i - curr_data_node_left->keys.begin())));
-            } else if(start_key > *i){
+                range_search_output.push_back(std::make_pair(*i, curr_data_node_left->values.at(std::distance(i, curr_data_node_left->keys.rend() - 1))));
+            }
+            else if(start_key > *i){
                 continue_search_left = false;
                 break;
             }
