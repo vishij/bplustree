@@ -28,6 +28,15 @@ public:
     // Subtract 1 because of the FLT_MAX as max/guard value
     int get_no_of_keys() { return keys.size() - 1; }
 
+    // TODO remove this temporary method
+    virtual void print_all_keys() {
+        for (std::vector<float>::const_iterator i = keys.begin(), j = --keys.end(); i < j; ++i) {
+            std::cout << *i << " ";
+        }
+        std::cout << std::endl;
+
+    }
+
     friend class BPlusTree;
 };
 
@@ -122,6 +131,14 @@ private:
 
 public:
     virtual std::string get_type() override { return "DATA"; }
+
+    virtual void print_all_keys() override {
+        for (std::vector<float>::const_iterator i = keys.begin(), j = --keys.end(); i < j; ++i) {
+            std::cout << "KEY VAL PAIR: " << *i << ",  " << values.at(i - keys.begin()) << std::endl;
+        }
+        std::cout << std::endl;
+
+    }
 
     /**
      * Insert K-V pair in a given node

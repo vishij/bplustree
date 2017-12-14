@@ -186,3 +186,31 @@ std::vector<std::pair<float, std::string>> BPlusTree::search(float start_key, fl
 
     return range_search_output;
 }
+
+/**
+ * Print function for debugging - BFS
+ */
+void BPlusTree::bfs_tree_print() {
+    std::queue<Node *> q;
+    q.push(root);
+
+    while (!q.empty()) {
+        InternalNode *curr_node = static_cast<InternalNode *>(q.front());
+        q.pop();
+        for (auto const &child: curr_node->child_ptrs) {
+            if (child->get_type().compare("DATA") != 0) {
+                q.push(child);
+            }
+        }
+        curr_node->print_all_keys();
+    }
+}
+
+/**
+ * Print function for debugging - all keys in DataNode
+ */
+void BPlusTree::print_keys() {
+    for (DataNode *dn = head; dn != nullptr; dn = dn->right) {
+        dn->print_all_keys();
+    }
+}

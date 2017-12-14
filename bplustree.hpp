@@ -32,6 +32,14 @@ public:
      * @return
      */
     std::vector<std::pair<float, std::string>> search(float start_key, float end_key);
+
+    // for internal debugging
+    // TODO remove
+    void print_keys();
+
+    // for internal debugging
+    // TODO remove
+    void bfs_tree_print();
 };
 
 #endif
