@@ -29,24 +29,7 @@ If there are multiple values for some key, these may be output in any order. If 
 The following is the output file for the above input file.
 Value 67, Value1
 (-3.91,Value54609), (0.02,Value98), (3.55,Value1), (3.55,Value67), (4.01, Value10) Null
-3. Submission
-You must submit the following:
+
 1.Makefile: Your make file must be directly under the zip folder. No nested directories. 2. Source Program: Provide comments.
-3. REPORT:
-· The report should be in PDF format.
-· The report should contain your basic info: Name, UFID and UF Email account
-· Present function prototypes showing the structure of your programs. Include the structure of your program.
- 
-To submit, Please compress all your files together using a zip utility and submit to the c a n v a s system. You should look for Assignment Project for the submission.
-Your submission should be named LastName_FirstName.zip.
-Please make sure the name you provided is the same as the same that appears on the Canvaas system. Please do not submit directly to a TA. All email submission will be ignored without further notification. Please note that the due day is a hard deadline. No late submission will be allowed. Anysubmissionafterthedeadlinewillnotbe accepted.
-4. Grading Policy
-Grading will be based on the correctness and efficiency of algorithms. details of the grading policy.
-Correct implementation and execution: 60%
-Comments and readability: 15%
-Below are some
-Report: 25%
-Note: If you do not follow the input/output or submission requirements above, 25% of your score will be deduced. In addition we may ask you to demonstrate your projects.
-5. Miscellaneous
- Do not use complex data structures provided by programming languages. You have to implement B+Tree data structure on your own using primitive data structures such as pointers. You must not use any BTree/ B+Tree related libraries.
- Your implementation should be your own. You have to work by yourself for this assignment (discussion is allowed). Your submission will be checked for plagiarism.
+2. Miscellaneous
+-Do not use complex data structures provided by programming languages. You have to implement B+Tree data structure on your own using primitive data structures such as pointers. You must not use any BTree/ B+Tree related libraries.
